@@ -9,7 +9,7 @@
 Просто откройте index.html или используйте GitHub Pages (https://heixin5.github.io/Divider/)
 
 ## Автор
-HeiXin5
+HeiXin5 + Qwen 3.5 Plus
 
 ## Лицензия
 GNU GPLv3
