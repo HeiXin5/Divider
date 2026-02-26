@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Делитель 1.4</title>
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #1e293b;
+            --input-bg: #0f172a;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --font-retro: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-retro);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .app-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Static Top Section */
+        .controls-section {
+            padding: 20px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .input-wrapper {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+        }
+
+        input[type="number"] {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: var(--font-retro);
+            font-size: 20px;
+            padding: 12px;
+            width: 100%;
+            outline: none;
+            text-align: center;
+        }
+
+        /* Remove arrows from number input */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .btn-control {
+            background-color: var(--border-color);
+            color: var(--text-main);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 20px;
+            font-family: var(--font-retro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .btn-control:hover {
+            background-color: #475569;
+        }
+
+        .btn-control.primary {
+            background-color: var(--accent);
+        }
+        .btn-control.primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            position: relative;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-family: var(--font-retro);
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.2s;
+        }
+
+        .toggle-btn.active {
+            color: var(--text-main);
+        }
+
+        .toggle-bg {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            background-color: var(--border-color);
+            border-radius: 4px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 1;
+        }
+
+        /* Scrollable Results Section */
+        .results-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for flex scrolling */
+            padding: 20px;
+            padding-top: 10px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .results-list {
+            flex: 1;
+            background-color: rgba(15, 23, 42, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Custom Scrollbar */
+        .results-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .results-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .results-list::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            font-size: 16px;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .item-num {
+            color: var(--text-muted);
+            width: 30px;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .item-val {
+            color: var(--text-main);
+            font-weight: bold;
+        }
+
+        .sum-display {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Controls (Static) -->
+        <div class="controls-section">
+            
+            <!-- Total Input -->
+            <div>
+                <label class="label">Сумма</label>
+                <div class="input-wrapper">
+                    <input type="number" id="totalInput" value="100" placeholder="0">
+                </div>
+            </div>
+
+            <!-- Parts Input -->
+            <div>
+                <label class="label">Количество частей</label>
+                <div class="input-wrapper">
+                    <button class="btn-control" onclick="adjustParts(-1)">-</button>
+                    <input type="number" id="partsInput" value="5">
+                    <button class="btn-control primary" onclick="adjustParts(1)">+</button>
+                </div>
+            </div>
+
+            <!-- Mode Toggle -->
+            <div>
+                <label class="label">Режим</label>
+                <div class="toggle-container">
+                    <div class="toggle-bg" id="toggleBg"></div>
+                    <button class="toggle-btn active" id="btnEven" onclick="setMode('even')">Поровну</button>
+                    <button class="toggle-btn" id="btnRandom" onclick="setMode('random')">Рандомно</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Results (Scrollable) -->
+        <div class="results-section">
+            <div class="results-header">
+                <span class="label">Результат</span>
+                <span class="sum-display" id="sumCheck">Сумма: 0</span>
+            </div>
+            
+            <div class="results-list" id="resultsList">
+                <!-- Items injected via JS -->
+                <div style="padding: 20px; text-align: center; color: var(--text-muted); font-style: italic;">
+                    Введите число
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mode = 'even';
+        
+        const totalInput = document.getElementById('totalInput');
+        const partsInput = document.getElementById('partsInput');
+        const resultsList = document.getElementById('resultsList');
+        const toggleBg = document.getElementById('toggleBg');
+        const btnEven = document.getElementById('btnEven');
+        const btnRandom = document.getElementById('btnRandom');
+        const sumCheck = document.getElementById('sumCheck');
+
+        // Initialize
+        calculate();
+
+        // Listeners
+        totalInput.addEventListener('input', calculate);
+        partsInput.addEventListener('input', () => {
+            if(partsInput.value < 1) partsInput.value = 1;
+            calculate();
+        });
+
+        function adjustParts(delta) {
+            let current = parseInt(partsInput.value) || 0;
+            let newVal = current + delta;
+            if (newVal < 1) newVal = 1;
+            partsInput.value = newVal;
+            calculate();
+        }
+
+        function setMode(newMode) {
+            mode = newMode;
+            if (mode === 'even') {
+                toggleBg.style.transform = 'translateX(0)';
+                btnEven.classList.add('active');
+                btnRandom.classList.remove('active');
+            } else {
+                toggleBg.style.transform = 'translateX(100%)';
+                btnRandom.classList.add('active');
+                btnEven.classList.remove('active');
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const total = parseInt(totalInput.value) || 0;
+            const count = parseInt(partsInput.value) || 1;
+            
+            let parts = [];
+
+            if (count <= 0) {
+                renderList([]);
+                return;
+            }
+
+            if (mode === 'even') {
+                const base = Math.floor(total / count);
+                const remainder = total % count;
+                for (let i = 0; i < count; i++) {
+                    parts.push(base + (i < remainder ? 1 : 0));
+                }
+            } else {
+                // Random Logic: Weighted distribution to avoid extreme 0s or huge numbers
+                if (total === 0) {
+                    parts = new Array(count).fill(0);
+                } else {
+                    let weights = [];
+                    let sumWeights = 0;
+                    
+                    // Generate random weights between 0.5 and 1.5 relative to average
+                    for(let i=0; i<count; i++) {
+                        let w = 0.5 + Math.random(); 
+                        weights.push(w);
+                        sumWeights += w;
+                    }
+
+                    let distributed = 0;
+                    for(let i=0; i<count; i++) {
+                        let val = Math.round((weights[i] / sumWeights) * total);
+                        parts.push(val);
+                        distributed += val;
+                    }
+
+                    // Fix rounding errors
+                    let diff = total - distributed;
+                    if (diff !== 0) {
+                        parts[0] += diff;
+                    }
+                }
+            }
+
+            renderList(parts);
+        }
+
+        function renderList(items) {
+            resultsList.innerHTML = '';
+            
+            if (items.length === 0) {
+                resultsList.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-muted); font-style: italic;">Введите число</div>`;
+                sumCheck.innerText = `Сумма: 0`;
+                return;
+            }
+
+            let currentSum = 0;
+
+            items.forEach((val, index) => {
+                currentSum += val;
+                
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                
+                const numSpan = document.createElement('span');
+                numSpan.className = 'item-num';
+                numSpan.innerText = (index + 1) + '.';
+                
+                const valSpan = document.createElement('span');
+                valSpan.className = 'item-val';
+                valSpan.innerText = val.toLocaleString('ru-RU');
+
+                item.appendChild(numSpan);
+                item.appendChild(valSpan);
+                resultsList.appendChild(item);
+            });
+
+            sumCheck.innerText = `Сумма: ${currentSum.toLocaleString('ru-RU')}`;
+            
+            const total = parseInt(totalInput.value) || 0;
+            if(currentSum !== total && total > 0) {
+                sumCheck.style.color = '#ef4444'; // Red for error
+            } else {
+                sumCheck.style.color = 'var(--text-muted)';
+            }
+        }
+    </script>
+</body>
+</html>
+
